@@ -22,15 +22,15 @@ for idx, lab in enumerate(training_labs):
         start_label=1,
     )
     segments_list.append(seg)
-    print(f"[slic] Εικόνα {idx}: δημιουργήθηκαν {seg.max()} superpixels.")
+    print(f"Εικόνα {idx}: δημιουργήθηκαν {seg.max()} superpixels.")
 
-    # Προαιρετική οπτικοποίηση για την 1η εικόνα
-    if idx == 0:
-        marked = mark_boundaries(training_rgbs[0], seg)
+    for idx in range(len(training_rgbs)):
+        marked = mark_boundaries(training_rgbs[idx], seg)
         plt.imshow(marked)
-        plt.title("Superpixels (1η εικόνα εκπαίδευσης)")
+        plt.title(f"Superpixels (εικόνα {idx + 1})")
         plt.axis("off")
         plt.show()
+        
 
 # Αποθήκευση όλων
 np.savez("artifacts/slic_segments.npz", *segments_list)

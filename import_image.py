@@ -35,15 +35,18 @@ for path in TRAINING_IMAGE_PATHS:
     training_labs.append(lab)
 
     # Διαχωρισμός των καναλιών
-    L_channels.append(lab[:, :, 0])
-    a_channels.append(lab[:, :, 1])
-    b_channels.append(lab[:, :, 2])
+    L = lab[:, :, 0]
+    a = lab[:, :, 1]
+    b = lab[:, :, 2]
 
-    print(f"Φορτώθηκε {path} με σχήμα {rgb.shape}")
-    print(f"Εύρος τιμών L: {L_channel.min():.2f} έως {L_channel.max():.2f}")
-    print(f"Εύρος τιμών a: {a_channel.min():.2f} έως {a_channel.max():.2f}")
-    print(f"Εύρος τιμών b: {b_channel.min():.2f} έως {b_channel.max():.2f}")
+    L_channels.append(L)
+    a_channels.append(a)
+    b_channels.append(b)
 
+    print(f"[OK] Φορτώθηκε {path} με σχήμα {rgb.shape}")
+    print(f"    Εύρος τιμών L: {L.min():.2f} έως {L.max():.2f}")
+    print(f"    Εύρος τιμών a: {a.min():.2f} έως {a.max():.2f}")
+    print(f"    Εύρος τιμών b: {b.min():.2f} έως {b.max():.2f}")
 
 image_rgb = training_rgbs[0]
 image_lab = training_labs[0]

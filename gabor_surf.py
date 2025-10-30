@@ -146,7 +146,7 @@ y_all = []
 for idx, (lab_img, L_img, segments_img, qlabels_img) in enumerate(
     zip(training_labs, L_channels, segments_list, quantized_labels_list)
 ):
-    print(f"[gabor_surf] Επεξεργασία εικόνας εκπαίδευσης #{idx}...")
+    print(f"Επεξεργασία εικόνας εκπαίδευσης #{idx}...")
 
     X_img, valid_sp = extract_features_for_image(L_img, segments_img)
     # παίρνουμε το mode της κβάντισης μέσα στο superpixel
