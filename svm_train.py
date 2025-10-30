@@ -1,56 +1,47 @@
+# svm_train.py
+# ------------
+# Βήμα v: εκπαιδεύουμε SVM πάνω στα features που έβγαλε το gabor_surf.py
+
 import numpy as np
+import joblib
 from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
-import joblib # Βιβλιοθήκη για αποθήκευση του εκπαιδευμένου μοντέλου
 
-print("Βήμα v: Εκπαίδευση SVM...")
+print("Εκκίνηση...")
 
-# 1. Εισαγωγή των X και y από το προηγούμενο βήμα
-from gabor_surf import X_features as X_train_all
-from gabor_surf import y_labels as y_train_all
+# 1. Φορτώνουμε τα X, y
+data = np.load("artifacts/training_features.npz")
+X_train = data["X"]
+y_train = data["y"]
 
-# Έλεγχος ότι τα δεδομένα είναι καθαρά (όπως και πριν)
-if np.isnan(X_train_all).any():
-    print("ΣΦΑΛΜΑ: Τα δεδομένα εκπαίδευσης (X) περιέχουν NaN. Διακοπή.")
-    exit()
-if not np.isfinite(X_train_all).all():
-    print("ΣΦΑΛΜΑ: Τα δεδομένα εκπαίδευσης (X) περιέχουν άπειρες τιμές. Διακοπή.")
-    exit()
-    
-print(f"Φορτώθηκαν {X_train_all.shape[0]} δείγματα εκπαίδευσης με {X_train_all.shape[1]} χαρακτηριστικά.")
+print(f"X_train shape = {X_train.shape}")
+print(f"y_train shape = {y_train.shape}")
 
-# 2. Δημιουργία του Pipeline
-#    α) StandardScaler: Κανονικοποιεί τα features
-#    β) SVC: Ο ταξινομητής SVM
-#       - probability=True: ΑΠΑΡΑΙΤΗΤΟ για το Βήμα VI (Graph Cuts)
-#       - kernel='rbf': (Radial Basis Function) Καλό για μη-γραμμικά δεδομένα
-#       - C=1.0: Παράμετρος κανονικοποίησης (default, καλό για αρχή)
+# 2. Φορτώνουμε και την παλέτα (για να ξέρουμε πόσες κλάσεις έχουμε)
+kmeans = joblib.load("artifacts/kmeans_palette.joblib")
+n_color_classes = kmeans.n_clusters
+print(f"Παλέτα με {n_color_classes} κλάσεις.")
+
+# 3. Φτιάχνουμε pipeline: StandardScaler -> SVC
 clf = make_pipeline(
     StandardScaler(),
-    SVC(C=1.0, kernel='rbf', probability=True, random_state=42)
+    SVC(
+        C=10.0,
+        kernel="rbf",
+        probability=True,   # ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ για το graph cut
+        class_weight="balanced",
+        gamma="scale",
+    ),
 )
 
-print("Το pipeline δημιουργήθηκε. Ξεκινά η εκπαίδευση (fit)...")
-print("(Αυτό μπορεί να διαρκέσει μερικά λεπτά...)")
+clf.fit(X_train, y_train)
+print("Το SVM εκπαιδεύτηκε.")
 
-# 3. Εκπαίδευση του μοντέλου
-clf.fit(X_train_all, y_train_all)
+# 4. Αποθήκευση
+joblib.dump(clf, "artifacts/svm_colorizer.joblib")
+print("Αποθηκεύτηκε στο artifacts/svm_colorizer.joblib")
 
-print("--- Η εκπαίδευση του SVM (Βήμα v) ολοκληρώθηκε! ---")
-
-# 4. Αποθήκευση του εκπαιδευμένου μοντέλου
-#    Αυτό είναι ΚΡΙΣΙΜΟ. Δεν θέλουμε να εκπαιδεύουμε το SVM
-#    κάθε φορά που θέλουμε να χρωματίσουμε μια εικόνα.
-model_filename = 'svm_colorizer.joblib'
-joblib.dump(clf, model_filename)
-
-print(f"Το εκπαιδευμένο μοντέλο αποθηκεύτηκε στο αρχείο: {model_filename}")
-
-# 5. Έλεγχος πιθανοτήτων
-#    Ας δούμε τι πιθανότητες δίνει για τα 5 πρώτα δείγματα
-predicted_probabilities = clf.predict_proba(X_train_all[:5])
-print("\nΔείγμα πιθανοτήτων για τα 5 πρώτα superpixels:")
-print(f"(Shape: {predicted_probabilities.shape})")
-# (Το shape θα είναι 5, N_COLOR_CLASSES)
-print(predicted_probabilities)
+# 5. Μικρό check
+probs = clf.predict_proba(X_train[:5])
+print("Probabilities sample shape:", probs.shape)
