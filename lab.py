@@ -1,4 +1,3 @@
-# lab.py (βελτιωμένο)
 import os
 import numpy as np
 import joblib
@@ -44,4 +43,3 @@ for idx, lab in enumerate(training_labs):
     print(f"Εικόνα {idx}: quantized_labels shape = {labels.shape}")
 
 np.savez("artifacts/quantized_labels.npz", *quantized_labels_list)
-print("ΤΕΛΟΣ ii.")

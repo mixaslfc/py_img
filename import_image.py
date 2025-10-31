@@ -1,7 +1,3 @@
-# import_image.py
-# ----------------
-# Φορτώνει τις εικόνες εκπαίδευσης που έχουμε ορίσει στη λίστα TRAINING_IMAGE_PATHS.
-
 import os
 import numpy as np
 from skimage import io, color
@@ -28,13 +24,11 @@ for path in TRAINING_IMAGE_PATHS:
     rgb = io.imread(path)
     if rgb.dtype != np.float64:
         rgb = rgb.astype(np.float64) / 255.0
-    # Μετατροπή από RGB σε Lab
     lab = color.rgb2lab(rgb)
 
     training_rgbs.append(rgb)
     training_labs.append(lab)
 
-    # Διαχωρισμός των καναλιών
     L = lab[:, :, 0]
     a = lab[:, :, 1]
     b = lab[:, :, 2]
@@ -43,7 +37,7 @@ for path in TRAINING_IMAGE_PATHS:
     a_channels.append(a)
     b_channels.append(b)
 
-    print(f"[OK] Φορτώθηκε {path} με σχήμα {rgb.shape}")
+    print(f"Φορτώθηκε {path} με σχήμα {rgb.shape}")
     print(f"    Εύρος τιμών L: {L.min():.2f} έως {L.max():.2f}")
     print(f"    Εύρος τιμών a: {a.min():.2f} έως {a.max():.2f}")
     print(f"    Εύρος τιμών b: {b.min():.2f} έως {b.max():.2f}")
