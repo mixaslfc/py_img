@@ -10,11 +10,12 @@ from gabor_surf import extract_features_for_image
 
 print("--- Script Χρωματισμού (Πρόβλεψη) ---")
 
-TEST_IMAGE_PATH = "data/blacknwhite.jpg"
-N_SUPERPIXELS = 200
+# TEST_IMAGE_PATH = "data/blacknwhite.jpg"
+TEST_IMAGE_PATH = "data/blacknwhite_resever.jpg"
+N_SUPERPIXELS = 550
 COMPACTNESS = 10
-LAMBDA_SMOOTH = 20               
-EDGE_WEIGHT_SCALE = 200          
+LAMBDA_SMOOTH = 4               
+EDGE_WEIGHT_SCALE = 40          
 
 img = io.imread(TEST_IMAGE_PATH)
 
