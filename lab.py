@@ -6,7 +6,7 @@ from import_image import training_labs
 
 os.makedirs("artifacts", exist_ok=True)
 
-N_COLOR_CLASSES = 64
+N_COLOR_CLASSES = 16
 MAX_PER_IMAGE = 50000  # περιορισμός δείγματος γιατί είδαμε οτι μερικές εικόνες έχουν πάρα πολλά pixels
 
 all_ab = []

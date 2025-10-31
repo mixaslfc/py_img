@@ -5,11 +5,11 @@ from skimage import io, color
 TRAINING_IMAGE_PATHS = [
     "data/train_1.jpg",
     "data/train_2.jpg",
-    "data/train_3.jpg",
-    "data/train_4.jpg",
+    # "data/train_3.jpg",
+    # "data/train_4.jpg",
     "data/train_5.jpg",
     "data/train_6.jpg",
-    "data/train_7.jpg",
+    # "data/train_7.jpg",
     "data/train_8.jpg",
 ]
 
