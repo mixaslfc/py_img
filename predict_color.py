@@ -15,10 +15,10 @@ from gabor_surf import extract_features_for_image
 print("--- Script Χρωματισμού (Πρόβλεψη) ---")
 
 TEST_IMAGE_PATH = "data/blacknwhite.jpg"
-N_SUPERPIXELS = 400
+N_SUPERPIXELS = 200
 COMPACTNESS = 10
 LAMBDA_SMOOTH = 20               
-EDGE_WEIGHT_SCALE = 100          
+EDGE_WEIGHT_SCALE = 200          
 
 # 1. Φόρτωση test εικόνας (γκρι)
 img = io.imread(TEST_IMAGE_PATH)
@@ -131,6 +131,8 @@ for sp_label, color_label in zip(valid_labels_test, labels):
     final_b[mask] = ab[1]
 
 final_lab = np.stack([L_test, final_a, final_b], axis=-1)
+final_lab[:, :, 1] = np.clip(final_lab[:, :, 1], -110, 110)
+final_lab[:, :, 2] = np.clip(final_lab[:, :, 2], -110, 110)
 final_rgb = color.lab2rgb(final_lab)
 final_rgb = np.clip(final_rgb, 0.0, 1.0)
 out_path = "colored_result.png"

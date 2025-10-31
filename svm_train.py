@@ -45,3 +45,9 @@ print("Αποθηκεύτηκε στο artifacts/svm_colorizer.joblib")
 # 5. Μικρό check
 probs = clf.predict_proba(X_train[:5])
 print("Probabilities sample shape:", probs.shape)
+
+for i in range(5):
+    print(f"Sample {i}:")
+    for cls, p in zip(clf.named_steps["svc"].classes_, probs[i]):
+        print(f"  Class {cls}: {p:.4f}")
+print("ΤΕΛΟΣ v.")

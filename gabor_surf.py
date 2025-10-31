@@ -23,11 +23,19 @@ GABOR_FREQUENCIES = [0.2, 0.4]
 
 def _get_local_descriptor_extractor():
     """Επιστρέφει (name, extractor) όπου extractor έχει .detectAndCompute(...)"""
-    # προσπαθούμε SURF
+       
+       
+    # 1) δοκίμασε πραγματικά SURF -> υπάρχει πρόβλημα με άδειες εγκατάστασης OpenCV
     if hasattr(cv2, "xfeatures2d") and hasattr(cv2.xfeatures2d, "SURF_create"):
-        surf = cv2.xfeatures2d.SURF_create(hessianThreshold=400)
-        return "SURF", surf
-    # αλλιώς ORB (υπάρχει σχεδόν πάντα)
+        try:
+            surf = cv2.xfeatures2d.SURF_create(hessianThreshold=400)
+            # test call για να δούμε αν υλοποιήθηκε
+            surf.detectAndCompute(np.zeros((20, 20), np.uint8), None)
+            return "SURF", surf
+        except cv2.error:
+            pass  # υπάρχει αλλά είναι compiled χωρίς nonfree
+
+    # 2) fallback
     orb = cv2.ORB_create(nfeatures=500)
     return "ORB", orb
 
@@ -88,7 +96,7 @@ def extract_features_for_image(L_img, segments_img):
     # descriptor length
     desc_len = 64 if DESCRIPTOR_NAME == "SURF" else 32
 
-    feature_dim = 2 + n_gabor_feats + desc_len  # meanL, stdL
+    feature_dim = 2 + n_gabor_feats + desc_len + 2  # meanL, stdL, gabors, descriptor, location
     X_img = np.zeros((n_sp, feature_dim), dtype=np.float32)
 
     # προετοιμασία gabor bank (φίλτρα σε ΟΛΗ την εικόνα)
@@ -102,10 +110,10 @@ def extract_features_for_image(L_img, segments_img):
 
     # gray για SURF/ORB
     gray_8u = (L_img / L_img.max() * 255.0).astype(np.uint8)
-
+    h, w = L_img.shape
     for i, sp_id in enumerate(valid_labels):
         mask = (segments_img == sp_id)
-
+        ys, xs = np.where(mask)
         # 1) φωτεινότητα
         L_vals = L_img[mask]
         mean_L = L_vals.mean()
@@ -127,7 +135,14 @@ def extract_features_for_image(L_img, segments_img):
         )
         feats.extend(desc_vec.tolist())
 
+        #4)Τοποθεσία
+        mean_x = xs.mean() / w
+        mean_y = ys.mean() / h
+        feats.append(mean_x)
+        feats.append(mean_y)
+
         X_img[i, :] = np.array(feats, dtype=np.float32)
+
 
     return X_img, valid_labels
 
